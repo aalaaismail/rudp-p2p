@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import at.cn.p2p.Util;
+import at.cn.p2p.server.Hostlist;
 
 public class Availability extends Thread {
 	
@@ -41,7 +42,7 @@ public class Availability extends Thread {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(outputStream);
 		
 			log.info("write status to objectOutputStream");
-			objectOutput.writeObject(this.status);
+			objectOutput.writeObject(this.status+" "+Util.getOnOffPort());
 
         	log.info("get streams");
 	        InputStream inputStream = socket.getInputStream();
@@ -52,6 +53,8 @@ public class Availability extends Thread {
 		        hostList = (Vector) objectInput.readObject();	        
 		        Util.printHosts(hostList);
 		        log.info("receiving results done");
+		        
+		        new Hostlist().add(hostList);
 			}
 	        
 	        objectInput.close();

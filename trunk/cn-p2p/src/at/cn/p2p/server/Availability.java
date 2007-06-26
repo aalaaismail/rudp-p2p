@@ -11,8 +11,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
-import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -26,9 +26,9 @@ public class Availability extends Thread {
 	private int port;
 	private Hostlist hostlist = new Hostlist();
 	
-	public Availability(int pPort) {
-		log.info("constructing new daemon thread..");
-		this.port = pPort;
+	public Availability(int port) {
+		log.info("constructing new Availability daemon thread on port " + port);
+		this.port = port;
 	}
 	
 	public void run() {
@@ -86,22 +86,26 @@ public class Availability extends Thread {
 				OutputStream outputStream = clientSocket.getOutputStream();	
 				ObjectOutput objectOutput = new ObjectOutputStream(outputStream);
 
-				log.info("read status..");
+				log.info("read status and uris..");
 				String status = (String) objectInput.readObject();
+				String[] statusAndUris = StringUtils.split(status);
+				status = statusAndUris[0];
+				int availPort = Integer.parseInt(statusAndUris[1]);
 
 				InetAddress inetAddress = clientSocket.getInetAddress();
+				URI uri = new URI("p2p://"+inetAddress.getHostAddress()+":"+availPort);
 				
 				if (status.equals("on")) {
-					log.info("online host: " + inetAddress.getHostAddress());
+					log.info("online host: " + uri);
 					
 					objectOutput.writeObject(hostlist.getHostList());
 					
-					hostlist.add(new URI("p2p://"+inetAddress.getHostAddress()));
+					hostlist.add(uri);
 				}
 				else if (status.equals("off")) {
-					log.info("offline host: " + inetAddress.getHostAddress());
+					log.info("offline host: " + uri);
 					
-					hostlist.remove(new URI("p2p://"+inetAddress.getHostAddress()));					
+					hostlist.remove(uri);					
 				}
 				else {
 					throw new Exception("invalid status: " + status);

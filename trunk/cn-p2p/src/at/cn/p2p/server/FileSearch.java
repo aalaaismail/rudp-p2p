@@ -25,7 +25,7 @@ public class FileSearch extends Thread {
 	private SharedFiles sharedFiles;
 	
 	public FileSearch(int port, String sharedFolder) {
-		log.info("constructing new daemon thread..");
+		log.info("constructing new FileSearch daemon thread on port " + port);
 		this.port = port;
 		this.sharedFiles = new SharedFiles(sharedFolder);
 	}
@@ -42,7 +42,7 @@ public class FileSearch extends Thread {
 		}
 
 		try {
-			//while (true) {
+			while (true) {
 		        try {
 		    		log.info("wait for client to connect...");  		        	
 		        	Socket client = serverSocket.accept();
@@ -53,7 +53,7 @@ public class FileSearch extends Thread {
 		        catch (IOException ioe) {
 		        	log.error("Problem accepting client's socket connection: " + ioe);
 		        }
-			//}
+			}
 		}
 		catch (ThreadDeath e) {
 			// When the thread is killed, close the server socket

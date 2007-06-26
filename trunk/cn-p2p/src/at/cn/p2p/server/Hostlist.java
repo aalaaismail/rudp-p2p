@@ -10,7 +10,7 @@ public class Hostlist {
 	
 	private Log log = LogFactory.getLog(Hostlist.class);	
 
-	private Vector<URI> hostList = new Vector<URI>();
+	private static Vector<URI> hostList;
 	
 	public Hostlist() {
 		// singleton
@@ -29,6 +29,10 @@ public class Hostlist {
 	
 	public synchronized boolean add(URI uri) {
 		return hostList.add(uri);
+	}
+	
+	public synchronized boolean add(Vector<URI> uris) {
+		return hostList.addAll(uris);
 	}
 
 	public Vector<URI> getHostList() {
