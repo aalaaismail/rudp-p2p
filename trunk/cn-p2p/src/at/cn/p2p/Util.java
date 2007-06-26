@@ -2,6 +2,7 @@ package at.cn.p2p;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -46,6 +47,11 @@ public class Util {
 			System.out.println(file.getName());
 	}
 	
+	public static void printHosts(Vector<URI> hosts) {
+		for (URI uri : hosts)
+			System.out.println(uri);
+	}
+	
 	public static Vector<File> transform(List<File> files) {
 		Vector<File> v = new Vector<File>(); 
 	    for (File file : files) {
@@ -74,7 +80,7 @@ public class Util {
 		    	log.info("loading " + propFile.getCanonicalFile());
 		        //properties.load(new FileInputStream(propFile.getCanonicalFile()));
 		    	
-		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cnetworks/classes/p2p.properties"));
+		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cn-p2p/classes/p2p.properties"));
 			}
 			catch (Exception e) {
 				log.error(e);
