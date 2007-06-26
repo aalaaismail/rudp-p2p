@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<project name="CNetworks" default="compile" basedir=".">
+	
+	<property name="build.compiler" value="modern" />
+
+	<property name="source.dir" value="src" />
+	<property name="resource.dir" value="resources" />
+	<property name="build.dir" value="classes" />
+		
+	
+	<property name="classpath.logging" value="lib/commons-logging-1.1.jar" />
+	<property name="classpath.lang" value="lib/commons-lang-2.2.jar" />
+	
+	<property name="classpath_complete" value="${build.dir}:${classpath.logging}:${classpath.lang}" />
+	
+	
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: init                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="init">
+		<mkdir dir="${build.dir}" />
+	</target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: clean                      
+         - - - - - - - - - - - - - - - - - -->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: compile                      
+        - - - - - - - - - - - - - - - - - -->
+	<target name="compile" depends="clean, init">
+		<javac srcdir="${source.dir}" destdir="${build.dir}" classpath="${classpath_complete}" debug="true"/>
+
+        <copy includeemptydirs="false" todir="${build.dir}">
+            <fileset dir="${resource.dir}" excludes="**/*.java"/>
+        </copy>	
+   	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: testFileTransfer                      
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="testFileTransfer" depends="compile">
+		<java classname="at.cn.p2p.TestFileTransfer" fork="true" classpath="${classpath_complete}">
+			
+		</java>
+   	</target>	
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: TestFileSearch                      
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="testFileSearch" depends="compile">
+		<java classname="at.cn.p2p.TestFileSearch" fork="true" classpath="${classpath_complete}">
+			
+		</java>
+   	</target>
+</project>
