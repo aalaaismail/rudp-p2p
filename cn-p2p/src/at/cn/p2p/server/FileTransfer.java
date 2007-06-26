@@ -21,9 +21,9 @@ public class FileTransfer extends Thread {
 	private int port;
 	private SharedFiles sharedFiles;
 	
-	public FileTransfer(int pPort, String sharedFolder) {
-		log.info("constructing new daemon thread..");
-		this.port = pPort;
+	public FileTransfer(int port, String sharedFolder) {
+		log.info("constructing new FileTransfer daemon thread on port " + port);
+		this.port = port;
 		this.sharedFiles = new SharedFiles(sharedFolder);
 	}
 	
@@ -39,7 +39,7 @@ public class FileTransfer extends Thread {
 		}
 
 		try {
-			//while (true) {
+			while (true) {
 		        try {
 		    		log.info("wait for client to connect...");  		        	
 		        	Socket client = serverSocket.accept();
@@ -50,7 +50,7 @@ public class FileTransfer extends Thread {
 		        catch (IOException ioe) {
 		        	log.error("Problem accepting client's socket connection: " + ioe);
 		        }
-			//}
+			}
 		}
 		catch (ThreadDeath e) {
 			// When the thread is killed, close the server socket

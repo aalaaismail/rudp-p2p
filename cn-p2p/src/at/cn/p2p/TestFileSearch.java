@@ -14,6 +14,7 @@ public class TestFileSearch {
 	protected static Log log = LogFactory.getLog(TestFileSearch.class);
 	
 	public static void main(String[] args) {
+		Util.loadProperties("p2p_1.properties");
 		
 		/*
 		 * test "local" file search

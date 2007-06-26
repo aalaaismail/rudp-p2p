@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="CNetworks" default="compile" basedir=".">
+<project name="CNetworks" default="gui1" basedir=".">
 	
 	<property name="build.compiler" value="modern" />
 
@@ -63,6 +63,36 @@
 	<target name="testAvailability" depends="compile">
 		<java classname="at.cn.p2p.TestAvailability" fork="true" classpath="${classpath_complete}">
 			
+		</java>
+   	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: gui 1                    
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="gui1" depends="compile">
+		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
+			<arg value="p2p_1.properties"/>
+			<arg value="p2p://127.0.0.1:2325"/>
+		</java>
+   	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: gui 2                    
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="gui2" depends="compile">
+		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
+			<arg value="p2p_2.properties"/>
+			<arg value="p2p://127.0.0.1:2325"/>
+		</java>
+   	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: gui 3                    
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="gui3" depends="compile">
+		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
+			<arg value="p2p_3.properties"/>
+			<arg value="p2p://127.0.0.1:2325"/>
 		</java>
    	</target>
 </project>

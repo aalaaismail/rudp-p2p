@@ -1,7 +1,10 @@
 package at.cn.p2p;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,27 +21,22 @@ public class Util {
 	private static Properties properties;
 	
 	public static String getDownloadFolder() {
-		load();
 		return properties.getProperty("DownloadFolder");
 	}
 
 	public static String getSharedFolder() {
-		load();
 		return properties.getProperty("SharedFolder");
 	}
 
 	public static int getFileTransferPort() {
-		load();
 		return Integer.parseInt(properties.getProperty("FileTransferPort"));
 	}
 
 	public static int getOnOffPort() {
-		load();
 		return Integer.parseInt(properties.getProperty("OnOffPort"));
 	}
 
 	public static int getSearchPort() {
-		load();
 		return Integer.parseInt(properties.getProperty("SearchPort"));
 	}
 	
@@ -66,24 +64,49 @@ public class Util {
 	    	l.add(file);
 	    }
 	    return l;
+	}	
+	
+	public static int getUserInputInt() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		int input = 0;
+		try {
+			input = Integer.parseInt(in.readLine());	    	
+		} 
+		catch (IOException ioe)	{
+			log.error(ioe.toString());  
+		}
+		return input; 
+	}
+	
+	public static String getUserInputString() {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		String input = "";
+		try {
+			input = in.readLine();	    	
+		} 
+		catch (IOException ioe)	{
+			log.error(ioe.toString());  
+		}
+		return input; 
 	}
 
-	private static void load() {
+	public static void loadProperties(String fileName) {
 		if (properties == null) {
 			try {
-				/*
-				 * TODO make path relative
-				 */
 		    	properties = new Properties();
+				/*
+				 *  TODO make loading path relative
+				 *  
 		    	String path = TestFileTransfer.class.getResource("").getPath();
-		    	File propFile = new File(path+"../../../../resources/p2p.properties");
+		    	File propFile = new File(path+"../../../../resources/" + fileName);
 		    	log.info("loading " + propFile.getCanonicalFile());
 		        //properties.load(new FileInputStream(propFile.getCanonicalFile()));
-		    	
-		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cn-p2p/classes/p2p.properties"));
+		    	*/
+				log.info("loading " + fileName);
+		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cn-p2p/classes/" + fileName));
 			}
 			catch (Exception e) {
-				log.error(e);
+				log.error("error loading properties: " + e);
 			}
 		}
 	}

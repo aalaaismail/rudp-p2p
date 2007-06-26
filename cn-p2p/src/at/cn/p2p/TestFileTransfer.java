@@ -14,6 +14,7 @@ public class TestFileTransfer {
 	protected static Log log = LogFactory.getLog(TestFileTransfer.class);
 
 	public static void main(String[] args) {
+		Util.loadProperties("p2p_1.properties");
 	    
 	    try {	    	
 			FileTransfer fileTransferServer = new FileTransfer(

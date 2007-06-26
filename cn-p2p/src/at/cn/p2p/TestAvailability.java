@@ -8,11 +8,15 @@ import org.apache.commons.logging.LogFactory;
 
 import at.cn.p2p.server.Availability;
 
-public class TestAvailability {
+/**
+ * won't work correctly, since Hostlist has become static
+ */
+public class TestAvailability {	
 	
 	protected static Log log = LogFactory.getLog(TestAvailability.class);
 	
 	public static void main(String[] args) {
+		Util.loadProperties("p2p_1.properties");
 	    try {	 
 	    	/*
 	    	 * start server
