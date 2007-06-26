@@ -56,4 +56,13 @@
 			
 		</java>
    	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - 
+          target: TestAvailability                      
+        - - - - - - - - - - - - - - - - - -->	
+	<target name="testAvailability" depends="compile">
+		<java classname="at.cn.p2p.TestAvailability" fork="true" classpath="${classpath_complete}">
+			
+		</java>
+   	</target>
 </project>
