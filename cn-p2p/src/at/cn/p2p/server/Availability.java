@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URI;
+import java.util.Vector;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -36,6 +37,7 @@ public class Availability extends Thread {
 			log.info("creating a server socket to accept connections..");
 			
 			serverSocket = new ServerSocket(port);
+			
 		}
 		catch (Exception e) {
 			log.error("Problem establishing server socket: " + e);
@@ -76,6 +78,7 @@ public class Availability extends Thread {
 			this.clientSocket = clientSocket;
 		}
 		
+		@SuppressWarnings("unchecked")
 		public void run() {
 			try {			
 				log.info("get inputstream..");
@@ -98,21 +101,23 @@ public class Availability extends Thread {
 				if (status.equals("on")) {
 					log.info("online host: " + uri);
 					
-					objectOutput.writeObject(hostlist.getHostList());
+					objectOutput.writeObject(hostlist.getAllHosts());
 					
 					hostlist.add(uri);
 				}
 				else if (status.equals("off")) {
 					log.info("offline host: " + uri);
 					
-					hostlist.remove(uri);					
+					Vector<URI> hostList = (Vector<URI>) objectInput.readObject();
+					hostlist.add(hostList);
+					hostlist.remove(uri);
 				}
 				else {
 					throw new Exception("invalid status: " + status);
 				}
 				
 				System.out.println("--- server-stored hostlist ---");
-				Util.printHosts(hostlist.getHostList());
+				Util.printHosts(hostlist.getAllHosts());
 				System.out.println("------------------------------");
 				
 				objectOutput.flush();

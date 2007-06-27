@@ -20,18 +20,11 @@ public class TextGui {
 		}
 	}
 	
-	private ServerInit serverInit;
+	private Application application;
 	
 	public TextGui(URI firstHost) {
-		serverInit = new ServerInit(firstHost);
-		serverInit.start();
-		
-		// wait for server threads to start
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		application = new Application(firstHost);
+		application.start();
 	}
 
 	public void doMenu() {
@@ -57,7 +50,7 @@ public class TextGui {
 					this.doSuche();
 					break;
 				case 2:
-					Util.printHosts(serverInit.getHostlist());
+					Util.printHosts(application.getHostlist().getAllHosts());
 					break;
 				case 3:
 					break;
@@ -69,14 +62,17 @@ public class TextGui {
 	    	}	
 		}
 		
-		serverInit.stop();
+		application.stop();
 		System.exit(0);
 	}
 	
 	public void doSuche() {
 		System.out.println("");
-		System.out.print("Suchstring: ");
+		System.out.println("Suchstring: ");
+		System.out.flush();
 		
-		String suchString = Util.getUserInputString();
+		String searchString = Util.getUserInputString();
+		
+		application.search(searchString);
 	}
 }

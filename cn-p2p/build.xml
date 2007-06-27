@@ -72,7 +72,7 @@
 	<target name="gui1" depends="compile">
 		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
 			<arg value="p2p_1.properties"/>
-			<arg value="p2p://127.0.0.1:2325"/>
+			<arg value="p2p://127.0.0.1:2323"/>
 		</java>
    	</target>
 
@@ -82,7 +82,7 @@
 	<target name="gui2" depends="compile">
 		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
 			<arg value="p2p_2.properties"/>
-			<arg value="p2p://127.0.0.1:2325"/>
+			<arg value="p2p://127.0.0.1:2323"/>
 		</java>
    	</target>
 
@@ -92,7 +92,7 @@
 	<target name="gui3" depends="compile">
 		<java classname="at.cn.p2p.TextGui" fork="true" classpath="${classpath_complete}">
 			<arg value="p2p_3.properties"/>
-			<arg value="p2p://127.0.0.1:2325"/>
+			<arg value="p2p://127.0.0.1:2323"/>
 		</java>
    	</target>
 </project>
