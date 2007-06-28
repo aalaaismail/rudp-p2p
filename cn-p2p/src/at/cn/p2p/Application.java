@@ -1,8 +1,10 @@
 package at.cn.p2p;
 
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,14 +32,14 @@ public class Application {
 		this.uri = uri;
 		
 		availabilityServer = new Availability(
-				Util.getOnOffPort());
+				Util.getBasePort());
 		
 		fileSearchServer = new FileSearch(
-				Util.getSearchPort(), 
+				Util.getBasePort() + 1, 
 				Util.getSharedFolder());
 		
 		fileTransferServer = new FileTransfer(
-				Util.getFileTransferPort(), 
+				Util.getBasePort() + 2, 
 				Util.getSharedFolder());
 		
 		hostlist = new Hostlist();
@@ -93,11 +95,13 @@ public class Application {
 	}
 	
 	public void search(String searchString) {
+		searchResult = new SearchResult();
+		
 		List<at.cn.p2p.client.FileSearch> fileSearchThreads = 
 			new ArrayList<at.cn.p2p.client.FileSearch>(); 
 		for (URI uri : hostlist.getOtherHosts()) {
 			at.cn.p2p.client.FileSearch fileSearchClient = 
-				new at.cn.p2p.client.FileSearch(uri, searchString);		
+				new at.cn.p2p.client.FileSearch(Util.addIntToPort(uri, 1), searchString);		
 			fileSearchClient.start();
 			fileSearchThreads.add(fileSearchClient);
 		}
@@ -110,6 +114,15 @@ public class Application {
 				log.error(e);
 			}
 		}
+	}
+	
+	public void download(File file, Vector<URI> hosts) {
+		at.cn.p2p.client.FileTransfer fileTransferClient = new at.cn.p2p.client.FileTransfer(
+				Util.addIntToPort(hosts.get(0), 1),
+				Util.getDownloadFolder(),
+				file);	
+		
+		fileTransferClient.start();
 	}
 	
 	public Hostlist getHostlist() {

@@ -1,6 +1,5 @@
 package at.cn.p2p.test;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -32,7 +31,7 @@ public class TestFileSearch {
 	     */
 	    try {	    	
 			FileSearch fileSearchServer = new FileSearch(
-					Util.getSearchPort(), 
+					Util.getBasePort() + 1, 
 					Util.getSharedFolder());
 			
 			fileSearchServer.start();
@@ -40,7 +39,7 @@ public class TestFileSearch {
 			Thread.sleep(500);				
 			
 			at.cn.p2p.client.FileSearch fileSearchClient = new at.cn.p2p.client.FileSearch(
-					new URI("p2p://127.0.0.1:" + Util.getSearchPort()),
+					new URI("p2p://127.0.0.1:" + (Util.getBasePort() + 1)),
 					"spring");	
 			
 			fileSearchClient.start();
@@ -48,7 +47,9 @@ public class TestFileSearch {
 			fileSearchClient.join();
 			
 			System.out.println("======= REMOTE search results =======");
-			Util.printSearchResult(new SearchResult());						
+			Util.printSearchResult(new SearchResult());	
+			
+			System.out.println("Hit Strg-C to exit finished Test");					
 	    }
 		catch (InterruptedException e) {
 	    	log.error(e);

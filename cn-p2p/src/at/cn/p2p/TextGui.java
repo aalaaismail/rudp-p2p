@@ -2,8 +2,6 @@ package at.cn.p2p;
 
 import java.io.File;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Set;
 import java.util.Vector;
 
 public class TextGui {
@@ -18,7 +16,7 @@ public class TextGui {
 			TextGui gui = new TextGui(firstHost);
 			gui.doMenu();
 		} 
-		catch (URISyntaxException e) {
+		catch (Exception e) {
 			System.err.println("Usage: TextGui <property-file> <uri>");
 		}
 	}
@@ -101,8 +99,9 @@ public class TextGui {
 		
 		System.out.println("trying to download file " + file + " from following hosts:");
 		Util.printHosts(hosts);
+		
+		application.download(file, hosts);
 	}
-
 	
 	public void printSearchResult() {
 		Util.printSearchResult(application.getSearchResult());

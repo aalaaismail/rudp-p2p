@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -30,16 +31,8 @@ public class Util {
 		return properties.getProperty("SharedFolder");
 	}
 
-	public static int getFileTransferPort() {
-		return Integer.parseInt(properties.getProperty("FileTransferPort"));
-	}
-
-	public static int getOnOffPort() {
-		return Integer.parseInt(properties.getProperty("OnOffPort"));
-	}
-
-	public static int getSearchPort() {
-		return Integer.parseInt(properties.getProperty("SearchPort"));
+	public static int getBasePort() {
+		return Integer.parseInt(properties.getProperty("BasePort"));
 	}
 	
 	public static void printFiles(List<File> files) {
@@ -101,6 +94,20 @@ public class Util {
 			log.error(ioe.toString());  
 		}
 		return input; 
+	}
+	
+	public static URI addIntToPort(URI uri, int i) {
+		String scheme = uri.getScheme();
+		String host = uri.getHost();
+		int port = uri.getPort() + i;
+		URI modiefiedURI = null;
+		try {
+			modiefiedURI = new URI(scheme + "://" + host + ":" + port);
+		} 
+		catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return modiefiedURI;
 	}
 
 	public static void loadProperties(String fileName) {
