@@ -23,7 +23,7 @@ public class TestAvailability {
 	    	/*
 	    	 * start server
 	    	 */
-			Availability availabilityServer = new Availability(Util.getOnOffPort());
+			Availability availabilityServer = new Availability(Util.getBasePort());
 			availabilityServer.start();
 			
 			Thread.sleep(500);				
@@ -32,19 +32,19 @@ public class TestAvailability {
 			 * register some online hosts
 			 */
 			at.cn.p2p.client.Availability availabilityClient1 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"on");
 			availabilityClient1.start();
 			Thread.sleep(500);	
 			
 			at.cn.p2p.client.Availability availabilityClient2 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"on");
 			availabilityClient2.start();
 			Thread.sleep(500);	
 			
 			at.cn.p2p.client.Availability availabilityClient3 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"on");
 			availabilityClient3.start();
 			Thread.sleep(1000);	
@@ -61,19 +61,19 @@ public class TestAvailability {
 			 */
 			Thread.sleep(500);	
 			at.cn.p2p.client.Availability availabilityClient4 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"off");
 			availabilityClient4.start();
 			Thread.sleep(500);
 			
 			at.cn.p2p.client.Availability availabilityClient5 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"off");
 			availabilityClient5.start();
 			Thread.sleep(500);
 			
 			at.cn.p2p.client.Availability availabilityClient6 = new at.cn.p2p.client.Availability(
-					new URI("p2p://127.0.0.1:" + Util.getOnOffPort()),
+					new URI("p2p://127.0.0.1:" + Util.getBasePort()),
 					"off");
 			availabilityClient6.start();
 			Thread.sleep(500);

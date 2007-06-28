@@ -38,7 +38,7 @@ public class FileSearch extends Thread {
 	public void run() {		
 		try {
 			log.info("creating socket for host " + uri);
-			socket = new Socket(uri.getHost(), uri.getPort() + 1);
+			socket = new Socket(uri.getHost(), uri.getPort());
 		
 			log.info("getObjectOutput");
 			OutputStream outputStream = socket.getOutputStream();

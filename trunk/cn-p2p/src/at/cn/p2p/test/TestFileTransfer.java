@@ -19,7 +19,7 @@ public class TestFileTransfer {
 	    
 	    try {	    	
 			FileTransfer fileTransferServer = new FileTransfer(
-					Util.getFileTransferPort(), 
+					Util.getBasePort() + 2, 
 					Util.getSharedFolder());
 			
 			fileTransferServer.start();
@@ -27,11 +27,15 @@ public class TestFileTransfer {
 			Thread.sleep(500);				
 			
 			at.cn.p2p.client.FileTransfer fileTransferClient = new at.cn.p2p.client.FileTransfer(
-					new URI("p2p://127.0.0.1:" + Util.getFileTransferPort()),
+					new URI("p2p://127.0.0.1:" + (Util.getBasePort() + 2)),
 					Util.getDownloadFolder(),
 					new File(Util.getSharedFolder() + "/spring-src.zip"));	
 			
 			fileTransferClient.start();
+			
+			fileTransferClient.join();
+			
+			System.out.println("Hit Strg-C to exit finished Test");
 	    }
 		catch (InterruptedException e) {
 	    	log.error(e);

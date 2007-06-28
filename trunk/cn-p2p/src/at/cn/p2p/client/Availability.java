@@ -47,7 +47,7 @@ public class Availability extends Thread {
 				ObjectInputStream objectInput = new ObjectInputStream(inputStream);
 			
 				log.info("write status to objectOutputStream");
-				objectOutput.writeObject(this.status+" "+Util.getOnOffPort());
+				objectOutput.writeObject(this.status+" "+Util.getBasePort());
 				
 				if (status.equals("on")) {
 			        log.info("receiving results..");

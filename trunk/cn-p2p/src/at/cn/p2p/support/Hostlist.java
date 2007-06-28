@@ -31,8 +31,8 @@ public class Hostlist {
 			try {
 				localUris.add(new URI(
 						"p2p://"+InetAddress.getLocalHost().getHostAddress()+":"+
-						Util.getOnOffPort()));
-				localUris.add(new URI("p2p://127.0.0.1:"+Util.getOnOffPort()));
+						Util.getBasePort()));
+				localUris.add(new URI("p2p://127.0.0.1:"+Util.getBasePort()));
 			} 
 			catch (UnknownHostException e) {
 				log.error(e);
