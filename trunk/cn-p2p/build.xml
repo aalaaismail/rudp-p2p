@@ -43,7 +43,7 @@
           target: testFileTransfer                      
         - - - - - - - - - - - - - - - - - -->	
 	<target name="testFileTransfer" depends="compile">
-		<java classname="at.cn.p2p.TestFileTransfer" fork="true" classpath="${classpath_complete}">
+		<java classname="at.cn.p2p.test.TestFileTransfer" fork="true" classpath="${classpath_complete}">
 			
 		</java>
    	</target>	
@@ -52,7 +52,7 @@
           target: TestFileSearch                      
         - - - - - - - - - - - - - - - - - -->	
 	<target name="testFileSearch" depends="compile">
-		<java classname="at.cn.p2p.TestFileSearch" fork="true" classpath="${classpath_complete}">
+		<java classname="at.cn.p2p.test.TestFileSearch" fork="true" classpath="${classpath_complete}">
 			
 		</java>
    	</target>
@@ -61,7 +61,7 @@
           target: TestAvailability                      
         - - - - - - - - - - - - - - - - - -->	
 	<target name="testAvailability" depends="compile">
-		<java classname="at.cn.p2p.TestAvailability" fork="true" classpath="${classpath_complete}">
+		<java classname="at.cn.p2p.test.TestAvailability" fork="true" classpath="${classpath_complete}">
 			
 		</java>
    	</target>

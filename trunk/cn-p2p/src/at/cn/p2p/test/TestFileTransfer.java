@@ -1,4 +1,4 @@
-package at.cn.p2p;
+package at.cn.p2p.test;
 
 import java.io.File;
 import java.net.URI;
@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.Util;
 import at.cn.p2p.server.FileTransfer;
 
 public class TestFileTransfer {

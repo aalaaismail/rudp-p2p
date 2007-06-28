@@ -16,33 +16,24 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import at.cn.p2p.Util;
-import at.cn.p2p.server.Hostlist;
+import at.cn.p2p.support.Hostlist;
 
 public class Availability extends Thread {
 	
 	protected Log log = LogFactory.getLog(Availability.class);
 	
-	private volatile List<URI> uris;
+	private URI uri;
 	private Socket socket;
 	private String status;
-	private volatile Vector<URI> hostList;
 	
 	public Availability(URI uri, String status) {
 		log.info("constructing new Availability client thread..");
-		this.uris = new ArrayList<URI>();
-		this.uris.add(uri);
-		this.status = status;
-	}
-	
-	public Availability(List<URI> uri, String status) {
-		log.info("constructing new Availability client thread..");
-		this.uris = uri;
+		this.uri = uri;
 		this.status = status;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void run() {	
-		for (URI uri : this.uris) {	
+	public void run() {		
 			try {
 				log.info("creating socket for host " + uri);
 				socket = new Socket(uri.getHost(), uri.getPort());
@@ -60,12 +51,17 @@ public class Availability extends Thread {
 				
 				if (status.equals("on")) {
 			        log.info("receiving results..");
-			        hostList = (Vector) objectInput.readObject();	        
+			        Vector<URI> hostList = (Vector) objectInput.readObject();	        
 			        Util.printHosts(hostList);
 			        log.info("receiving results done");
 			        
-			        this.uris.addAll(hostList);
-			        new Hostlist().add(hostList);
+			        Hostlist h = new Hostlist();
+//			        for (URI u : hostList) {
+//			        	if (uri != u && !h.isLocalUri(u))
+//			        		new Availability(u, status).start();			        	
+//			        }			        	
+			        	
+			        h.add(hostList);
 				}
 				else if (status.equals("off")) {
 					log.info("write hostlist to objectOutputStream");
@@ -90,10 +86,5 @@ public class Availability extends Thread {
 			catch (IOException ioe) {
 				log.error(ioe);
 			}
-		}
-	}
-
-	public Vector<URI> getHostList() {
-		return hostList;
 	}
 }

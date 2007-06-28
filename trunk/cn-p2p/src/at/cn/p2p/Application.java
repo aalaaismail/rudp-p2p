@@ -1,8 +1,8 @@
 package at.cn.p2p;
 
-import java.net.InetAddress;
 import java.net.URI;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -10,7 +10,9 @@ import org.apache.commons.logging.LogFactory;
 import at.cn.p2p.server.Availability;
 import at.cn.p2p.server.FileSearch;
 import at.cn.p2p.server.FileTransfer;
-import at.cn.p2p.server.Hostlist;
+import at.cn.p2p.support.Hostlist;
+import at.cn.p2p.support.SearchResult;
+import at.cn.p2p.support.SharedFiles;
 
 public class Application {
 	
@@ -21,6 +23,8 @@ public class Application {
 	private FileTransfer fileTransferServer;
 	private URI uri;
 	private Hostlist hostlist;
+	private SearchResult searchResult;
+	private SharedFiles sharedFiles;
 	
 	public Application(URI uri) {
 		this.uri = uri;
@@ -38,6 +42,9 @@ public class Application {
 		
 		hostlist = new Hostlist();
 		hostlist.add(uri);
+		
+		searchResult = new SearchResult();
+		sharedFiles = new SharedFiles(Util.getSharedFolder());
 	}
 	
 	public void start() {
@@ -61,16 +68,22 @@ public class Application {
 	
 	@SuppressWarnings("deprecation")
 	public void stop() {
-		at.cn.p2p.client.Availability availabilityClient = 
-			new at.cn.p2p.client.Availability(hostlist.getOtherHosts(), "off");
-		availabilityClient.start();
+		List<at.cn.p2p.client.Availability> availabilityThreads = 
+			new ArrayList<at.cn.p2p.client.Availability>();
+		for (URI uri : hostlist.getOtherHosts()) {
+			at.cn.p2p.client.Availability availabilityClient = 
+				new at.cn.p2p.client.Availability(uri, "off");
+			availabilityClient.start();
+			availabilityThreads.add(availabilityClient);
+		}
 		
 		availabilityServer.stop();
 		fileSearchServer.stop();
 		fileTransferServer.stop();
 		
 		try {
-			availabilityClient.join();
+			for (at.cn.p2p.client.Availability availabilityThread : availabilityThreads)
+				availabilityThread.join();
 		} 
 		catch (InterruptedException e) {
 			log.error(e);
@@ -80,21 +93,35 @@ public class Application {
 	}
 	
 	public void search(String searchString) {
-		at.cn.p2p.client.FileSearch fileSearchClient = new at.cn.p2p.client.FileSearch(
-				hostlist.getOtherHosts(), searchString);		
-		fileSearchClient.start();
-		try {
-			fileSearchClient.join();
-			
-			System.out.println("------- search results -------");
-			Util.printFiles(fileSearchClient.getSearchResults());
+		List<at.cn.p2p.client.FileSearch> fileSearchThreads = 
+			new ArrayList<at.cn.p2p.client.FileSearch>(); 
+		for (URI uri : hostlist.getOtherHosts()) {
+			at.cn.p2p.client.FileSearch fileSearchClient = 
+				new at.cn.p2p.client.FileSearch(uri, searchString);		
+			fileSearchClient.start();
+			fileSearchThreads.add(fileSearchClient);
 		}
-		catch (InterruptedException e) {
-			log.error(e);
+		
+		for (at.cn.p2p.client.FileSearch thread : fileSearchThreads) {
+			try {
+				thread.join();
+			}
+			catch (InterruptedException e) {
+				log.error(e);
+			}
 		}
 	}
 	
 	public Hostlist getHostlist() {
 		return hostlist;
+	}
+
+	public SearchResult getSearchResult() {
+		return searchResult;
+	}
+
+	public SharedFiles getSharedFiles() {
+		sharedFiles.refresh();
+		return sharedFiles;
 	}
 }

@@ -1,4 +1,4 @@
-package at.cn.p2p.server;
+package at.cn.p2p.support;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -47,7 +47,7 @@ public class SharedFiles {
 	    return result;
 	}
 	
-	public void refreshSharedFiles() {
+	public void refresh() {
 		sharedFiles = this.getFileListing(new File(sharedFolder));
 	}
 	

@@ -15,6 +15,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import at.cn.p2p.Util;
+import at.cn.p2p.support.SharedFiles;
 
 public class FileSearch extends Thread {
 	

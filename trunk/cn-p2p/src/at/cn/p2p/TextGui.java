@@ -1,7 +1,10 @@
 package at.cn.p2p;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Set;
+import java.util.Vector;
 
 public class TextGui {
 
@@ -37,8 +40,11 @@ public class TextGui {
 			System.out.println("Waehlen Sie bitte aus folgenden Menuepunkten.");
 			System.out.println("");
 			System.out.println("1 Files suchen");
-			System.out.println("2 Hostlist anzeigen");
-			System.out.println("5 Programm beenden");
+			System.out.println("2 Suchergebnis anzeigen");
+			System.out.println("3 File downloaden");
+			System.out.println("4 Hostlist anzeigen");
+			System.out.println("5 Shared Files anzeigen");
+			System.out.println("6 Programm beenden");
 			System.out.println("");
 			System.out.println("Ihre Wahl: ");
 			System.out.flush();
@@ -47,16 +53,21 @@ public class TextGui {
 	    
 			switch (menu_input)	{	    
 				case 1: 
-					this.doSuche();
+					doSuche();
 					break;
 				case 2:
-					Util.printHosts(application.getHostlist().getAllHosts());
+					printSearchResult();
 					break;
 				case 3:
+					doDownload();
 					break;
 				case 4:
+					Util.printHosts(application.getHostlist().getAllHosts());
 					break;
 				case 5:
+					application.getSharedFiles().printSharedFiles();
+					break;
+				case 6:
 					run_menu = false;
 					break;
 	    	}	
@@ -74,5 +85,26 @@ public class TextGui {
 		String searchString = Util.getUserInputString();
 		
 		application.search(searchString);
+		
+		printSearchResult();
+	}
+	
+	public void doDownload() {
+		System.out.println("");
+		System.out.println("SearchResult Id zum Download: ");
+		System.out.flush();
+		
+		int id = Util.getUserInputInt();
+		
+		File file = application.getSearchResult().getFileFromId(id);
+		Vector<URI> hosts = application.getSearchResult().getHostsFromFile(file);
+		
+		System.out.println("trying to download file " + file + " from following hosts:");
+		Util.printHosts(hosts);
+	}
+
+	
+	public void printSearchResult() {
+		Util.printSearchResult(application.getSearchResult());
 	}
 }
