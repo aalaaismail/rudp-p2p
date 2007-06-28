@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import at.cn.p2p.Util;
+import at.cn.p2p.support.Hostlist;
 
 public class Availability extends Thread {
 	

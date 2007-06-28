@@ -1,13 +1,16 @@
-package at.cn.p2p;
+package at.cn.p2p.test;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.Util;
 import at.cn.p2p.server.FileSearch;
-import at.cn.p2p.server.SharedFiles;
+import at.cn.p2p.support.SearchResult;
+import at.cn.p2p.support.SharedFiles;
 
 public class TestFileSearch {
 	
@@ -21,7 +24,7 @@ public class TestFileSearch {
 		 */
 		SharedFiles sharedFiles = new SharedFiles(Util.getSharedFolder());
 		sharedFiles.printSharedFiles();		
-		System.out.println("------- search results -------");
+		System.out.println("======= LOCAL search results =======");
 		Util.printFiles(sharedFiles.search("Spring"));		
 
 	    /*
@@ -42,10 +45,10 @@ public class TestFileSearch {
 			
 			fileSearchClient.start();
 			
-			Thread.sleep(500);	
+			fileSearchClient.join();
 			
-			System.out.println("------- search results -------");
-			Util.printFiles(fileSearchClient.getSearchResults());
+			System.out.println("======= REMOTE search results =======");
+			Util.printSearchResult(new SearchResult());						
 	    }
 		catch (InterruptedException e) {
 	    	log.error(e);

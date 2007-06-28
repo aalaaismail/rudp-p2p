@@ -1,4 +1,4 @@
-package at.cn.p2p;
+package at.cn.p2p.test;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -6,7 +6,9 @@ import java.net.URISyntaxException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.Util;
 import at.cn.p2p.server.Availability;
+import at.cn.p2p.support.Hostlist;
 
 /**
  * won't work correctly, since Hostlist has become static
@@ -50,14 +52,9 @@ public class TestAvailability {
 			/*
 			 * print clients hostlists
 			 */
-			System.out.println("------- host list 1 -------");
-			Util.printHosts(availabilityClient1.getHostList());
-			
-			System.out.println("------- host list 2 -------");
-			Util.printHosts(availabilityClient2.getHostList());
-			
-			System.out.println("------- host list 3 -------");
-			Util.printHosts(availabilityClient3.getHostList());
+			Hostlist hostlist = new Hostlist();
+			System.out.println("------- host list -------");			
+			Util.printHosts(hostlist.getAllHosts());
 			
 			/*
 			 * unregister hosts

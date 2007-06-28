@@ -13,6 +13,8 @@ import java.net.Socket;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.support.SharedFiles;
+
 public class FileTransfer extends Thread {
 	
 	protected Log log = LogFactory.getLog(FileTransfer.class);

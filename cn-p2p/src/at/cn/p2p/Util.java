@@ -14,6 +14,8 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.support.SearchResult;
+
 public class Util {
 	
 	private static Log log = LogFactory.getLog(Util.class);
@@ -41,13 +43,24 @@ public class Util {
 	}
 	
 	public static void printFiles(List<File> files) {
-		for (File file : files)
+		for (File file : files) {
 			System.out.println(file.getName());
+		}
 	}
 	
 	public static void printHosts(Vector<URI> hosts) {
 		for (URI uri : hosts)
 			System.out.println(uri);
+	}
+	
+	public static void printSearchResult(SearchResult searchResult) {
+		int i = 0;		
+		System.out.println("======= search results =======");
+		for (File file : searchResult.getFiles()) {
+			++i;
+			System.out.println("(" + i +") " + file.getName() + " (" + searchResult.getHostsFromFile(file)+")");
+		}
+		System.out.println("==============================");
 	}
 	
 	public static Vector<File> transform(List<File> files) {
