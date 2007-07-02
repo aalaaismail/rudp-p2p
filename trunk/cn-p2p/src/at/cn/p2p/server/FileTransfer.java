@@ -1,5 +1,7 @@
 package at.cn.p2p.server;
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,9 +12,11 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.Util;
 import at.cn.p2p.support.SharedFiles;
 
 public class FileTransfer extends Thread {
@@ -86,17 +90,36 @@ public class FileTransfer extends Thread {
 				log.info("read filename..");
 				File file = (File) objectInput.readObject();
 				
+				log.info("read partition infos..");
+				String partitionInfo = (String) objectInput.readObject();
+				String[] partitionInfos = StringUtils.split(partitionInfo);
+				int begin = Integer.parseInt(partitionInfos[0]);
+				int end = Integer.parseInt(partitionInfos[1]);
+				
 				log.info("get inputstream of file " + file.getName());				
-				FileInputStream fileInputStream = new FileInputStream(file);				
+				DataInputStream di = new DataInputStream (new BufferedInputStream(new FileInputStream(file)));				
 				
 				log.info("sending file..");
-				byte[] buffer = new byte[16384];
+				int size = sharedFiles.getSizeFromFile(file);
+				log.info("size:  " + size);
+				log.info("begin: " + begin);
+				log.info("end:   " + end);
+				byte[] buffer = new byte[Util.BUFFER_LENGTH];
                 int len = 0;
-                while ((len = fileInputStream.read(buffer)) > 0) {
-                    outputStream.write(buffer, 0, len);
+                int i = 0;
+                while ((len = di.read(buffer)) > 0) {
+                	if ((i >= begin) && (i <= end)) {
+                		outputStream.write(buffer, 0, len);
+                		if ((len != Util.BUFFER_LENGTH) && !(i == end)) {
+                			log.error("buffer sizes are not the same: " + len + " - " + Util.BUFFER_LENGTH);
+                		}
+                	}
+                	i++;
                 }
-                log.info("sending file done..");				
-								
+        		outputStream.flush();
+                di.close();
+                log.info("sending file done..");
+                
 				objectInput.close();
 				outputStream.close();
 				inputStream.close();
@@ -104,6 +127,7 @@ public class FileTransfer extends Thread {
 		    } 
 		    catch (Exception e) {
 				log.error(e.getMessage());
+				e.printStackTrace();
 		    }
 		}
 	}

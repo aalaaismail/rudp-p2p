@@ -15,13 +15,38 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import at.cn.p2p.support.Download;
 import at.cn.p2p.support.SearchResult;
 
 public class Util {
 	
 	private static Log log = LogFactory.getLog(Util.class);
 	
+	public static final int BUFFER_LENGTH = 16384;
+	
 	private static Properties properties;
+
+
+	public static void loadProperties(String fileName) {
+		if (properties == null) {
+			try {
+		    	properties = new Properties();
+				/*
+				 *  TODO make loading path relative
+				 *  
+		    	String path = TestFileTransfer.class.getResource("").getPath();
+		    	File propFile = new File(path+"../../../../resources/" + fileName);
+		    	log.info("loading " + propFile.getCanonicalFile());
+		        //properties.load(new FileInputStream(propFile.getCanonicalFile()));
+		    	*/
+				log.info("loading " + fileName);
+		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cn-p2p/classes/" + fileName));
+			}
+			catch (Exception e) {
+				log.error("error loading properties: " + e);
+			}
+		}
+	}
 	
 	public static String getDownloadFolder() {
 		return properties.getProperty("DownloadFolder");
@@ -36,24 +61,47 @@ public class Util {
 	}
 	
 	public static void printFiles(List<File> files) {
+		System.out.println("------------- shared files ---------------");
 		for (File file : files) {
-			System.out.println(file.getName());
+			if (file.isFile())
+				System.out.println(file.getName());
 		}
+		System.out.println("------------------------------------------");
 	}
 	
 	public static void printHosts(Vector<URI> hosts) {
+		System.out.println("-------------- known hosts ---------------");
 		for (URI uri : hosts)
 			System.out.println(uri);
+		System.out.println("------------------------------------------");
 	}
 	
 	public static void printSearchResult(SearchResult searchResult) {
 		int i = 0;		
-		System.out.println("======= search results =======");
+		System.out.println("------------- search results -------------");
 		for (File file : searchResult.getFiles()) {
 			++i;
 			System.out.println("(" + i +") " + file.getName() + " (" + searchResult.getHostsFromFile(file)+")");
 		}
-		System.out.println("==============================");
+		System.out.println("------------------------------------------");
+	}
+	
+	public static void printConfiguration() {
+		System.out.println("------------- configuration --------------");
+		System.out.println("SharedFolder:   " + getSharedFolder());
+		System.out.println("DownloadFolder: " + getDownloadFolder());
+		System.out.println("Avail Port:     " + getBasePort());
+		System.out.println("Search Port:    " + (getBasePort() + 1));
+		System.out.println("Transfer Port:  " + (getBasePort() + 2));
+		System.out.println("Buffer Length:  " + BUFFER_LENGTH);
+		System.out.println("------------------------------------------");
+	}
+	
+	public static void printDownloads(List<Download> downloads) {
+		System.out.println("--------------- downloads ----------------");
+		for (Download download : downloads)
+			System.out.println(download);
+		System.out.println("------------------------------------------");
 	}
 	
 	public static Vector<File> transform(List<File> files) {
@@ -108,26 +156,5 @@ public class Util {
 			e.printStackTrace();
 		}
 		return modiefiedURI;
-	}
-
-	public static void loadProperties(String fileName) {
-		if (properties == null) {
-			try {
-		    	properties = new Properties();
-				/*
-				 *  TODO make loading path relative
-				 *  
-		    	String path = TestFileTransfer.class.getResource("").getPath();
-		    	File propFile = new File(path+"../../../../resources/" + fileName);
-		    	log.info("loading " + propFile.getCanonicalFile());
-		        //properties.load(new FileInputStream(propFile.getCanonicalFile()));
-		    	*/
-				log.info("loading " + fileName);
-		    	properties.load(new FileInputStream("C:/Dokumente und Einstellungen/el torro/Eigene Dateien/ASE2778/eclipsews/cn-p2p/classes/" + fileName));
-			}
-			catch (Exception e) {
-				log.error("error loading properties: " + e);
-			}
-		}
 	}
 }
