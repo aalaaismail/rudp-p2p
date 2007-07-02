@@ -1,6 +1,7 @@
 package at.cn.p2p.client;
 
-import java.io.File;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -10,11 +11,12 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.URI;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import at.cn.p2p.Util;
+import at.cn.p2p.support.Download;
 
 public class FileTransfer extends Thread {
 	
@@ -22,14 +24,17 @@ public class FileTransfer extends Thread {
 	
 	private URI uri;
 	private Socket socket;
-	private String downFolder;
-	private File file;
+	private int begin = 0;
+	private int end = 0;
+	private Download download;
 	
-	public FileTransfer(URI uri, String downFolder, File file) {
+	public FileTransfer(URI uri, Download download, 
+			int begin, int end) {
 		log.info("constructing new FileTransfer client thread..");
 		this.uri = uri;
-		this.downFolder = downFolder;
-		this.file = file;
+		this.download = download;
+		this.begin = begin;
+		this.end = end;
 	}
 	
 	public void run() {	
@@ -42,18 +47,26 @@ public class FileTransfer extends Thread {
 			ObjectOutputStream objectOutput = new ObjectOutputStream(o);
 		
 			log.info("write fileName to objectOutputStream");
-			objectOutput.writeObject(file);
+			objectOutput.writeObject(download.getRemoteFile());
+		
+			log.info("write partition Infos to objectOutputStream");
+			objectOutput.writeObject(begin + " " + end);
+			objectOutput.flush();
 
         	log.info("get streams");
-        	File downloadedFile = new File(downFolder + "/" + file.getName()); 
-        	OutputStream outputStream = new FileOutputStream(downloadedFile);
+        	OutputStream outputStream = new FileOutputStream(download.getLocalFile());
 	        InputStream inputStream = socket.getInputStream();
-	
+	        DataInputStream di = new DataInputStream (new BufferedInputStream(inputStream));
+	        
 	        log.info("receiving file..");
-	        byte[] buffer = new byte[16384];
+	        byte[] buffer = new byte[Util.BUFFER_LENGTH];
+	        int i = 0;
 	        int len = 0;
-	        while ((len = inputStream.read(buffer)) > 0) {
-	            outputStream.write(buffer, 0, len);
+	        while ((len = di.read(buffer)) > 0) {
+        		if ((len != Util.BUFFER_LENGTH) && !(i == end)) {
+        			log.error("buffer sizes are not the same: " + len + " - " + Util.BUFFER_LENGTH);
+        		}
+	        	download.addFragmentToStream(buffer, begin + i++, len);
 	        }
 	        log.info("receiving file done");		        
 	        

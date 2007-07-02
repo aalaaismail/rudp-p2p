@@ -18,6 +18,7 @@ public class TextGui {
 		} 
 		catch (Exception e) {
 			System.err.println("Usage: TextGui <property-file> <uri>");
+			e.printStackTrace();
 		}
 	}
 	
@@ -40,9 +41,13 @@ public class TextGui {
 			System.out.println("1 Files suchen");
 			System.out.println("2 Suchergebnis anzeigen");
 			System.out.println("3 File downloaden");
-			System.out.println("4 Hostlist anzeigen");
-			System.out.println("5 Shared Files anzeigen");
-			System.out.println("6 Programm beenden");
+			System.out.println("4 Downloads anzeigen");
+			System.out.println("5 Download unterbrechen");
+			System.out.println("6 Download fortsetzen");
+			System.out.println("7 Hostlist anzeigen");
+			System.out.println("8 Shared Files anzeigen");
+			System.out.println("9 Konfiguration anzeigen");
+			System.out.println("0 Programm beenden");
 			System.out.println("");
 			System.out.println("Ihre Wahl: ");
 			System.out.flush();
@@ -51,21 +56,33 @@ public class TextGui {
 	    
 			switch (menu_input)	{	    
 				case 1: 
-					doSuche();
+					search();
 					break;
 				case 2:
-					printSearchResult();
+					Util.printSearchResult(application.getSearchResult());
 					break;
 				case 3:
 					doDownload();
 					break;
 				case 4:
-					Util.printHosts(application.getHostlist().getAllHosts());
+					Util.printDownloads(application.getDownloads());
 					break;
 				case 5:
-					application.getSharedFiles().printSharedFiles();
+					application.suspendDownload();
 					break;
 				case 6:
+					application.resumeDownload();
+					break;
+				case 7:
+					Util.printHosts(application.getHostlist().getAllHosts());
+					break;
+				case 8:
+					application.getSharedFiles().printSharedFiles();
+					break;
+				case 9:
+					Util.printConfiguration();
+					break;
+				case 0:
 					run_menu = false;
 					break;
 	    	}	
@@ -75,7 +92,7 @@ public class TextGui {
 		System.exit(0);
 	}
 	
-	public void doSuche() {
+	public void search() {
 		System.out.println("");
 		System.out.println("Suchstring: ");
 		System.out.flush();
@@ -84,10 +101,12 @@ public class TextGui {
 		
 		application.search(searchString);
 		
-		printSearchResult();
+		Util.printSearchResult(application.getSearchResult());
 	}
 	
 	public void doDownload() {
+		Util.printSearchResult(application.getSearchResult());
+		
 		System.out.println("");
 		System.out.println("SearchResult Id zum Download: ");
 		System.out.flush();
@@ -101,9 +120,5 @@ public class TextGui {
 		Util.printHosts(hosts);
 		
 		application.download(file, hosts);
-	}
-	
-	public void printSearchResult() {
-		Util.printSearchResult(application.getSearchResult());
 	}
 }
