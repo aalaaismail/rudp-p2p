@@ -16,7 +16,8 @@ import java.io.IOException;
 public class RdpException extends IOException {
     
     /** Creates a new instance of RdpException */
-    public RdpException() {
+    public RdpException(String message) {
+        super(message);
     }
     
 }

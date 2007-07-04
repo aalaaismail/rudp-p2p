@@ -7,9 +7,7 @@
 
 package cn.p1.rdp;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -29,11 +27,13 @@ public class RdpSocket extends DatagramSocket {
 //    private Hashtable<ConnectionID, Integer> receiveConnectionTable = null;
     private Hashtable<String, Integer> sendConnectionTable = null;
     private Hashtable<String, Integer> receiveConnectionTable = null;
+    private int packetCount = 1;
+    private int errorRate = 2;
     
     /** Creates a new instance of RdpSocket */
     public RdpSocket(int port) throws SocketException {
         super(port);
-        setSoTimeout(1000000);
+        setSoTimeout(5000);
         //sendConnectionTable = new Hashtable<ConnectionID, Integer>();
         //receiveConnectionTable = new Hashtable<ConnectionID, Integer>();
         sendConnectionTable = new Hashtable<String, Integer>();
@@ -45,7 +45,8 @@ public class RdpSocket extends DatagramSocket {
         try {
             byte[] databuf = new byte[BUFLEN];
             DatagramPacket inPacket = new DatagramPacket(databuf, databuf.length);
-            super.receive(inPacket);
+            
+            receive_bench(inPacket);
             ConnectionID connection = new ConnectionID(inPacket.getAddress(), inPacket.getPort());
             RdpPacket packet = RdpPacket.instanciate(inPacket.getData());
             System.out.print("receiving packet " + connection.getAddress().getHostAddress() + ":" + connection.getPort() + "\t");
@@ -62,14 +63,17 @@ public class RdpSocket extends DatagramSocket {
                             p.setData(packet.getData());
                         } else {
                             System.out.println("WRONG CHECKSUM1");
-                            sendAck(connection, receiveConnectionTable.get(connection.toString()));
+                            throw new RdpException("RUDP: wrong checksum in received data packet");
+                            //sendAck(connection, receiveConnectionTable.get(connection.toString()));
                         }
                     } else {
                         System.out.println("WRONG SEQ1");
+                        throw new RdpException("RUDP: wrong order (SEQ) in received data");
                     }
                     
                 } else {
                     System.out.println("DATA PACKET ERWARTET1");
+                    throw new RdpException("RUDP: wrong packet type (DATA excepted)");
                 }
                 
                 
@@ -85,11 +89,10 @@ public class RdpSocket extends DatagramSocket {
                     //System.out.println(connection.toString());
                     sendAck(connection, receiveConnectionTable.get(connection.toString()) + 1);
                 } else {
-                    System.out.println("SYNC PACKET ERWARTET1");
+                        throw new RdpException("RUDP: Connection not open, SYNC required");
                 }
                 // receive DATA packet
                 packet = receivePacket(connection);
-                System.out.println("received: " + packet.getSeq());
                 if ((!packet.isSync()) && (!packet.isAck())) {
                     if (packet.getSeq() == receiveConnectionTable.get(connection.toString())) {
                         // seq OK
@@ -97,70 +100,24 @@ public class RdpSocket extends DatagramSocket {
                             sendAck(connection, receiveConnectionTable.get(connection.toString()) + 1);
                             p.setData(packet.getData());
                         } else {
-                        System.out.println("WRONG CHECKSUM2");
-                        sendAck(connection, receiveConnectionTable.get(connection.toString()));
+                            throw new RdpException("RUDP: wrong checksum in received data packet");
+                        //sendAck(connection, receiveConnectionTable.get(connection.toString()));
                         }
                     } else {
-                        System.out.println("WRONG SEQ2");
+                        throw new RdpException("RUDP: wrong order (SEQ) in received data");
                     }
                     
                 } else {
-                    System.out.println("DATA PACKET ERWARTET2");
+                    throw new RdpException("RUDP: wrong packet type (DATA excepted)");
                 }
                 
             }
             
-            
-            
-            // check seq
-            // check checksum
-            // return data
-            
-            
-            
-            /*
-            // receive data
-            byte[] databuf = new byte[BUFLEN];
-            DatagramPacket inPacket = new DatagramPacket(databuf, databuf.length, connection.getAddress(), connection.getPort());
-             
-            super.receive(inPacket);
-            //System.out.println(new String(inPacket.getData()));
-             
-            RdpPacket dataPacket = RdpPacket.instanciate(inPacket.getData());
-             
-            if ((!dataPacket.isSync()) && (!dataPacket.isAck())) {
-             
-                System.out.println(receiveConnectionTable.get(connection.toString()) + "==" + dataPacket.getSeq());
-                if (dataPacket.getSeq() == receiveConnectionTable.get(connection.toString())) {
-                    // all OK
-                    sendAck(connection);
-             
-                    p.setData(dataPacket.getData());
-                } else {
-                    System.out.println("WRONG SEQ");
-                }
-             
-            } else {
-                System.out.println("DATA PACKET ERWARTET");
-            }
-             */
-            // else data
-            // controll checksum
-            // send ok
-            
+        } catch (SocketTimeoutException ste) {
+            throw new RdpException("RUDP: no packet received!");
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-    
-    
-    private RdpPacket receivePacket(ConnectionID connection) throws IOException, ClassNotFoundException, Exception {
-        
-        byte[] databuf = new byte[BUFLEN];
-        DatagramPacket inPacket = new DatagramPacket(databuf, databuf.length, connection.getAddress(), connection.getPort());
-        super.receive(inPacket);
-        RdpPacket dataPacket = RdpPacket.instanciate(inPacket.getData());
-        return dataPacket;
     }
     
     public void send(DatagramPacket packet) throws IOException {
@@ -196,7 +153,7 @@ public class RdpSocket extends DatagramSocket {
                 } else {
                     
                     System.out.println("ACK ERWARTET");
-                    throw new Exception();
+                        throw new RdpException("RUDP: false ACK received");
                 }
             }
             try {
@@ -215,12 +172,21 @@ public class RdpSocket extends DatagramSocket {
                 
                 
                 System.out.print("receiving packet ack .. ");
-                RdpPacket ackPacket = receivePacket(connection);
-                
+
+                //setSoTimeout(1000);
+                RdpPacket ackPacket;
+                //try {
+                ackPacket = receivePacket(connection);
+                //} catch (SocketTimeoutException ste) {
+                //    System.out.print("timeout, resending");
+                //    sendPacket(dataPacket, connection);                
+                //    ackPacket = receivePacket(connection);
+                //    System.out.print("received!! SEQ=" + ackPacket.getSeq());
+                //}
                 if (ackPacket.isAck()) {
                     int seq = ackPacket.getSeq();
                     System.out.println("ACK SEQ=" + seq);
-                    
+                    // check if old packet requested
                     if (seq == sendConnectionTable.get(connection.toString())) {
                         // resend packet
                         System.out.println("RESENDING SEQ=" + seq);                        
@@ -231,12 +197,12 @@ public class RdpSocket extends DatagramSocket {
                } else {
                     
                     System.out.println("ACK ERWARTET2");
-                    throw new Exception();
+                        throw new RdpException("RUDP: false ACK received");
                 }
                 
                 
             } catch (SocketTimeoutException ste) {
-                System.out.println("Socket Timeout occured!");
+                        throw new RdpException("RUDP: Receive Timeout while waiting for ACK");
             }
             
         } catch (Exception e) {
@@ -244,13 +210,52 @@ public class RdpSocket extends DatagramSocket {
         }
         
     }
+
+        
+
+    private void receive_bench(DatagramPacket p) throws IOException {
+        super.receive(p);
+        if (((packetCount++) % errorRate) == 0) {
+            RdpPacket packet = null;
+            try {
+                packet = RdpPacket.instanciate(p.getData());
+            } catch (ClassNotFoundException ex) {
+                ex.printStackTrace();
+            } catch (IOException ex) {
+                ex.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        System.out.print("DROPPED INCOMMING:\t");
+        if (packet.isAck()) System.out.print("ACK\t");
+        if (packet.isSync()) System.out.print("SYN\t");
+        if ((!packet.isAck()) && (!packet.isSync())) System.out.print("DATA\t");
+        System.out.print(packet.getSeq());
+        System.out.println();
+            super.receive(p);
+        }
+    }
     
+    private RdpPacket receivePacket(ConnectionID connection) throws IOException, ClassNotFoundException, Exception {
+        
+        byte[] databuf = new byte[BUFLEN];
+        DatagramPacket inPacket = new DatagramPacket(databuf, databuf.length, connection.getAddress(), connection.getPort());
+        receive_bench(inPacket);
+        RdpPacket dataPacket = RdpPacket.instanciate(inPacket.getData());
+        return dataPacket;
+    }
+
     private void sendPacket(RdpPacket packet, ConnectionID con) throws IOException, Exception{
         byte[] payload = packet.toByteArray();
         
         DatagramPacket lowPacket = new DatagramPacket(payload, payload.length, con.getAddress(), con.getPort());
         //System.out.println("OUT: ---" + new String(lowPacket.getData()) + "---");
-        System.out.println("OUT: " + packet.getSeq());
+        System.out.print("OUT:\t");
+        if (packet.isAck()) System.out.print("ACK\t");
+        if (packet.isSync()) System.out.print("SYN\t");
+        if ((!packet.isAck()) && (!packet.isSync())) System.out.print("DATA\t");
+        System.out.print(packet.getSeq());
+        System.out.println();
         super.send(lowPacket);
     }
     
