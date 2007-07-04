@@ -38,7 +38,7 @@ public class RdpSocketTest {
             
         RdpSocket instance = new RdpSocket(4448);
         
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < 1; i++)
         {
             instance.receive(p);
             System.out.println(i + " " + new String(p.getData()));
@@ -66,17 +66,18 @@ public class RdpSocketTest {
             str = "1asdfghjkl";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "2yxcvbvnbm";
-            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "3qwerrtw53";
-            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "4444444444";
-            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             
             // new connection
-            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4449));
+//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4449));
 
             
         } catch (Exception e) {
+            System.out.print(e.getMessage());
             e.printStackTrace();
         }
     }
