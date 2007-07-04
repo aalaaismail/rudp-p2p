@@ -28,7 +28,7 @@ public class RdpSocketTest {
     /**
      * Test of receive method, of class cn.p1.rdp.RdpSocket.
      */
-    public void testReceive() throws Exception {
+    public void testReceive(int err) throws Exception {
         System.out.println("receive");
 
         byte[] buf = new byte[256];
@@ -37,8 +37,9 @@ public class RdpSocketTest {
             DatagramPacket p = new DatagramPacket(buf, buf.length);
             
         RdpSocket instance = new RdpSocket(4448);
+        instance.setErrorRate(err);
         
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 4; i++)
         {
             instance.receive(p);
             System.out.println(i + " " + new String(p.getData()));
@@ -48,7 +49,7 @@ public class RdpSocketTest {
     /**
      * Test of send method, of class cn.p1.rdp.RdpSocket.
      */
-    public void testSend() throws Exception {
+    public void testSend(int err) throws Exception {
         try {
             System.out.println("send");
             int payload_length = 256;
@@ -62,15 +63,15 @@ public class RdpSocketTest {
             InetAddress receiver = InetAddress.getLocalHost();
              
             RdpSocket instance = new RdpSocket(4447);
- 
+            instance.setErrorRate(err);
             str = "1asdfghjkl";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "2yxcvbvnbm";
-//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "3qwerrtw53";
-//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             str = "4444444444";
-//            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
             
             // new connection
 //            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4449));
@@ -87,12 +88,12 @@ public class RdpSocketTest {
     
         RdpSocketTest r = new RdpSocketTest("anttest");
         if (args[0].equals("s")) {
-                r.testSend();
+                r.testSend(Integer.parseInt(args[1]));
             
         }
 
         if (args[0].equals("r")) {
-            r.testReceive();
+            r.testReceive(Integer.parseInt(args[1]));
         }
     
             } catch (Exception ex) {

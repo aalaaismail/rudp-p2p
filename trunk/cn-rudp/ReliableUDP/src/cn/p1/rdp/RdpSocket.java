@@ -27,8 +27,8 @@ public class RdpSocket extends DatagramSocket {
 //    private Hashtable<ConnectionID, Integer> receiveConnectionTable = null;
     private Hashtable<String, Integer> sendConnectionTable = null;
     private Hashtable<String, Integer> receiveConnectionTable = null;
-    private int packetCount = 1;
-    private int errorRate = 2;
+    private int packetCount = 0;
+    private int errorRate = 10;
     
     /** Creates a new instance of RdpSocket */
     public RdpSocket(int port) throws SocketException {
@@ -215,7 +215,9 @@ public class RdpSocket extends DatagramSocket {
 
     private void receive_bench(DatagramPacket p) throws IOException {
         super.receive(p);
-        if (((packetCount++) % errorRate) == 0) {
+        //System.out.print(((int) Math.round(Math.random()*100)));        
+        if (((int) Math.round(Math.random()*100)) < getErrorRate()) {
+        //if (((packetCount++) % errorRate) == 0) {
             RdpPacket packet = null;
             try {
                 packet = RdpPacket.instanciate(p.getData());
@@ -338,6 +340,14 @@ public class RdpSocket extends DatagramSocket {
             }
         }
         
+    }
+
+    public int getErrorRate() {
+        return errorRate;
+    }
+
+    public void setErrorRate(int errorRate) {
+        this.errorRate = errorRate;
     }
     
     
