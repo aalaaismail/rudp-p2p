@@ -32,9 +32,17 @@ public class Application {
 	private volatile List<Download> downloads;
 	private volatile List<Downloader> downloaders;
 	
+	/**
+	 * init Application (servers and support datastructures)
+	 *  
+	 * @param uri the URI of first a p2p node
+	 */
 	public Application(URI uri) {
 		this.uri = uri;
 		
+		/*
+		 * init availability, filesearch and -transfer server
+		 */
 		availabilityServer = new Availability(
 				Util.getBasePort());
 		
@@ -55,8 +63,10 @@ public class Application {
 		downloaders = new ArrayList<Downloader>();
 	}
 	
-	public void start() {
-		log.info("STARTING SERVER THREADS");
+	public void start() {		
+		/*
+		 * start availability, filesearch and -transfer server
+		 */
 		availabilityServer.start();
 		fileSearchServer.start();
 		fileTransferServer.start();
@@ -69,13 +79,20 @@ public class Application {
 			log.error(e);
 		}
 		
-		// make ourself available
+		/*
+		 * make ourself available
+		 * (contact the given URI)
+		 */ 
 		if (!hostlist.isLocalUri(uri))
 			new at.cn.p2p.client.Availability(uri, "on").start();
 	}
 	
 	@SuppressWarnings("deprecation")
 	public void stop() {
+		/*
+		 * let every host know, that we go offline 
+		 * (start an availability client)
+		 */
 		List<at.cn.p2p.client.Availability> availabilityThreads = 
 			new ArrayList<at.cn.p2p.client.Availability>();
 		for (URI uri : hostlist.getOtherHosts()) {
@@ -85,10 +102,16 @@ public class Application {
 			availabilityThreads.add(availabilityClient);
 		}
 		
+		/*
+		 * stop server threads 
+		 */
 		availabilityServer.stop();
 		fileSearchServer.stop();
 		fileTransferServer.stop();
 		
+		/*
+		 * wait for the availability client to finish work
+		 */
 		try {
 			for (at.cn.p2p.client.Availability availabilityThread : availabilityThreads)
 				availabilityThread.join();
@@ -103,6 +126,10 @@ public class Application {
 	public void search(String searchString) {
 		this.searchResult = new SearchResult();
 		
+		/*
+		 * search on every other host
+		 * (start filesearch-client for every host we know) 
+		 */
 		List<at.cn.p2p.client.FileSearch> fileSearchThreads = 
 			new ArrayList<at.cn.p2p.client.FileSearch>(); 
 		for (URI uri : hostlist.getOtherHosts()) {
@@ -112,6 +139,9 @@ public class Application {
 			fileSearchThreads.add(fileSearchClient);
 		}
 		
+		/*
+		 * wait 'till search threads are finished 
+		 */
 		for (at.cn.p2p.client.FileSearch thread : fileSearchThreads) {
 			try {
 				thread.join();
@@ -130,6 +160,9 @@ public class Application {
 				sharedFiles.getSizeFromFile(file));	
 		downloads.add(download);
 		
+		/*
+		 * start a Downloader thread for the Download
+		 */
 		Downloader downloader = new Downloader(download);
 		downloaders.add(downloader);
 		downloader.start();
@@ -154,11 +187,9 @@ public class Application {
 
 	public void resumeDownload() {
 		for (Download download : downloads) {
-			//if (download.getDownloadStatus() != 100.0f) {
-				Downloader downloader = new Downloader(download);
-				downloaders.add(downloader);
-				downloader.start();
-			//}
+			Downloader downloader = new Downloader(download);
+			downloaders.add(downloader);
+			downloader.start();
 		}
 	}
 
@@ -167,6 +198,14 @@ public class Application {
 			downloader.suspendDownload();
 	}
 	
+	/**
+	 * A Thread that downloads a given Download
+	 * 
+	 * It therefore starts a client FileTransfer thread for every URI stored in Download.
+	 * The file is transfered Fragment-by-fragment. The file is written to disk (localFile), 
+	 * if the download is finished.
+	 *
+	 */
 	class Downloader extends Thread {
 		
 		private volatile Download download;
