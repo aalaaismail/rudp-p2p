@@ -41,8 +41,12 @@ public class RdpSocketTest {
         
         for (int i = 0; i < 4; i++)
         {
+            try {
             instance.receive(p);
-            System.out.println(i + " " + new String(p.getData()));
+                System.out.println(i + " " + new String(p.getData()));
+            } catch (RdpException re) {
+            System.out.println(i + " error");                
+            }
         }
     }
    
@@ -50,7 +54,7 @@ public class RdpSocketTest {
      * Test of send method, of class cn.p1.rdp.RdpSocket.
      */
     public void testSend(int err) throws Exception {
-        try {
+        try{
             System.out.println("send");
             int payload_length = 256;
             /*
@@ -64,14 +68,34 @@ public class RdpSocketTest {
              
             RdpSocket instance = new RdpSocket(4447);
             instance.setErrorRate(err);
-            str = "1asdfghjkl";
+        try{
+            str = "0123456789";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
-            str = "2yxcvbvnbm";
+            } catch (RdpException re) {
+                System.out.print(re.getMessage());
+                re.printStackTrace();
+            }
+        try{
+            str = "1234567890";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
-            str = "3qwerrtw53";
+            } catch (RdpException re) {
+                System.out.print(re.getMessage());
+                re.printStackTrace();
+            }
+        try{
+            str = "2345678901";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
-            str = "4444444444";
+            } catch (RdpException re) {
+                System.out.print(re.getMessage());
+                re.printStackTrace();
+            }
+        try{
+            str = "3456789012";
             instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4448));
+            } catch (RdpException re) {
+                System.out.print(re.getMessage());
+                re.printStackTrace();
+            }
             
             // new connection
 //            instance.send(new DatagramPacket(str.getBytes(), str.getBytes().length, receiver, 4449));

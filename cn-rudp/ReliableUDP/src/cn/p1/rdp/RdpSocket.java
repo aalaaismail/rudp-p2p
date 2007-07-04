@@ -33,7 +33,7 @@ public class RdpSocket extends DatagramSocket {
     /** Creates a new instance of RdpSocket */
     public RdpSocket(int port) throws SocketException {
         super(port);
-        setSoTimeout(5000);
+        setSoTimeout(10000);
         //sendConnectionTable = new Hashtable<ConnectionID, Integer>();
         //receiveConnectionTable = new Hashtable<ConnectionID, Integer>();
         sendConnectionTable = new Hashtable<String, Integer>();
@@ -42,12 +42,13 @@ public class RdpSocket extends DatagramSocket {
     
     
     public void receive(DatagramPacket p) throws IOException {
+        ConnectionID connection = null;
         try {
             byte[] databuf = new byte[BUFLEN];
             DatagramPacket inPacket = new DatagramPacket(databuf, databuf.length);
             
             receive_bench(inPacket);
-            ConnectionID connection = new ConnectionID(inPacket.getAddress(), inPacket.getPort());
+            connection = new ConnectionID(inPacket.getAddress(), inPacket.getPort());
             RdpPacket packet = RdpPacket.instanciate(inPacket.getData());
             System.out.print("receiving packet " + connection.getAddress().getHostAddress() + ":" + connection.getPort() + "\t");
             
@@ -109,24 +110,25 @@ public class RdpSocket extends DatagramSocket {
                     
                 } else {
                     throw new RdpException("RUDP: wrong packet type (DATA excepted)");
-                }
-                
+                }  
             }
             
         } catch (SocketTimeoutException ste) {
             throw new RdpException("RUDP: no packet received!");
         } catch (Exception e) {
-            e.printStackTrace();
+            receiveConnectionTable.remove(connection.toString());
+            throw new RdpException("RUDP: CONNECTION BROKEN");        
+            //e.printStackTrace();
         }
     }
     
     public void send(DatagramPacket packet) throws IOException {
         byte[] buf = new byte[256];
+            ConnectionID connection = new ConnectionID(packet.getAddress(), packet.getPort());
         try {
             
             System.out.print("sending packet to " + packet.getAddress().getHostAddress() + packet.getPort());
             
-            ConnectionID connection = new ConnectionID(packet.getAddress(), packet.getPort());
             
             if (sendConnectionTable.containsKey(connection.toString())) {
                 // continue with old connection
@@ -206,7 +208,10 @@ public class RdpSocket extends DatagramSocket {
             }
             
         } catch (Exception e) {
-            e.printStackTrace();
+            sendConnectionTable.remove(connection.toString());
+            throw new RdpException("RUDP: CONNECTION BROKEN");        
+          
+            //e.printStackTrace();
         }
         
     }
@@ -237,6 +242,7 @@ public class RdpSocket extends DatagramSocket {
             super.receive(p);
         }
     }
+    
     
     private RdpPacket receivePacket(ConnectionID connection) throws IOException, ClassNotFoundException, Exception {
         
@@ -309,38 +315,7 @@ public class RdpSocket extends DatagramSocket {
         
     }
     
-    private class ConnectionHandler {
-        
-        private Thread currentThread;
-        
-        public ConnectionHandler(){
-            
-        }
-        public ConnectionHandler(ConnectionID cID){
-            
-        }
-        
-        public void start() {
-            
-        /*if(currentThread == null){
-            currentThread = new Thread(this);
-            currentThread.start();
-         */
-            
-            
-            
-            
-            
-        }
-        
-        public void stop() { currentThread = null; }
-        
-        public void run() {
-            while(currentThread != null) {
-            }
-        }
-        
-    }
+ 
 
     public int getErrorRate() {
         return errorRate;
