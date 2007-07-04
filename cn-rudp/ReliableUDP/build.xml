@@ -70,12 +70,13 @@
 
 	<property name="classpath_complete" value="build/test/classes:build/classes:lib/simple-xml-1.4.jar:lib/stax-1.2.0.jar:lib/stax-api-1.0.1.jar" />
 	<property name="javac.classpath" value="${javac.classpath}:${classpath_complete}" />
+	<property name="errorRate" value="10" />
 
     	<target name="runTestSender" depends="compile,compile-test">
 		<java classname="cn.p1.rdp.RdpSocketTest"
 			fork="true"
 			classpath="${classpath_complete}">
-			<arg line="s"/>
+			<arg line="s ${errorRate}"/>
 		</java>	          
 	</target>
 
@@ -83,7 +84,7 @@
 		<java classname="cn.p1.rdp.RdpSocketTest"
 			fork="true"
 			classpath="${classpath_complete}">
-			<arg line="r"/>
+			<arg line="r ${errorRate}"/>
 		</java>	          
 	</target>
 
