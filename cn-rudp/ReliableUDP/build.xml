@@ -69,10 +69,9 @@
     	<property name="build.compiler" value="modern" />
 
 	<property name="classpath_complete" value="build/test/classes:build/classes:lib/simple-xml-1.4.jar:lib/stax-1.2.0.jar:lib/stax-api-1.0.1.jar" />
-	<property name="javac.classpath" value="{$javac.classpath}:${classpath_complete}" />
+	<property name="javac.classpath" value="${javac.classpath}:${classpath_complete}" />
 
     	<target name="runTestSender" depends="compile,compile-test">
-            <echo message="${classpath_complete}"/>
 		<java classname="cn.p1.rdp.RdpSocketTest"
 			fork="true"
 			classpath="${classpath_complete}">
